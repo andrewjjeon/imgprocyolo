@@ -1,118 +1,84 @@
-import os.path as osp
+import os
 import cv2
 import glob
 import numpy as np
-import pickle
-from tqdm import tqdm
-from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
 import random
 import shutil
-import os
-from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+from sklearn.cluster import KMeans
 
-# histograms = []
-train_image_dir = r'C:\Users\Andrew Jeon\OneDrive\Desktop\Fisheye\images\train'
-test_image_dir = r'C:\Users\Andrew Jeon\OneDrive\Desktop\Fisheye\images\test'
-train_label_dir = r'C:\Users\Andrew Jeon\OneDrive\Desktop\Fisheye\labels\train'
-test_label_dir = r'C:\Users\Andrew Jeon\OneDrive\Desktop\Fisheye\labels\test'
+img_dir = r'C:\Users\Andrew Jeon\OneDrive\Desktop\Fisheye\images'
+label_dir = r'C:\Users\Andrew Jeon\OneDrive\Desktop\Fisheye\labels'
 
-# Load train and test image paths
-train_images = glob.glob(os.path.join(train_image_dir, '*'))
-test_images = glob.glob(os.path.join(test_image_dir, '*'))
+train_img_dir = f"{img_dir}/train"
+test_img_dir = f"{img_dir}/test"
+train_label_dir = f"{label_dir}/train"
+test_label_dir = f"{label_dir}/test"
 
-# Load train and test label paths
-train_labels = glob.glob(os.path.join(train_label_dir, '*'))
-test_labels = glob.glob(os.path.join(test_label_dir, '*'))
+def load_image_paths(directory):
+    return glob.glob(os.path.join(directory, '*'))
 
-# Calculate saturation of each pixel
-pixel_saturation_train = []
-for img_path in tqdm(train_images):
-    image = cv2.imread(img_path)
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    saturation = hsv[:, :, 1].mean()  # Calculate mean saturation across all pixels
-    pixel_saturation_train.append(saturation)
+def compute_saturation(image_paths):
+    """Compute mean saturation for each image."""
+    saturations = []
+    for img_path in tqdm(image_paths, desc="computing mean saturation"):
+        image = cv2.imread(img_path)
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        saturations.append(hsv[:, :, 1].mean())
+    return np.array(saturations).reshape(-1, 1)
 
-pixel_saturation_test = []
-for img_path in tqdm(test_images):
-    image = cv2.imread(img_path)
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    saturation = hsv[:, :, 1].mean()  # Calculate mean saturation across all pixels
-    pixel_saturation_test.append(saturation)
+def perform_clustering(X, n_clusters=2):
+    """KMeans Clustering on images."""
+    np.random.seed(42)
+    kmeans = KMeans(n_clusters=n_clusters, n_init=10)
+    return kmeans.fit_predict(X)
 
-# Reshape data for clustering
-X_train = np.array(pixel_saturation_train).reshape(-1, 1)
-X_test = np.array(pixel_saturation_test).reshape(-1, 1)
+def visualize_clusters(image_paths, cluster_labels, cluster_names, num_samples=3):
+    """Visualize 3 random images from each cluster to confirm correct clustering."""
+    for label, cluster_name in cluster_names.items():
+        cluster_images = [img for img, lbl in zip(image_paths, cluster_labels) if lbl == label]
+        sampled_images = random.sample(cluster_images, min(num_samples, len(cluster_images)))
+        
+        print(f"Cluster {label + 1} ({cluster_name}):")
+        for img_path in sampled_images:
+            img = cv2.imread(img_path)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            plt.title(cluster_name)
+            plt.imshow(img)
+            plt.axis("off")
+            plt.show()
 
-# Perform K-means clustering for train data
-np.random.seed(42)  # Set a random seed for reproducibility
-kmeans_train = KMeans(n_clusters=2)
-kmeans_train.fit(X_train)
-train_cluster_labels = kmeans_train.labels_
+def move_files(file_paths, cluster_labels, base_dir, cluster_names):
+    """Move files into categorized directories based on clustering labels."""
+    for file_path, label in zip(file_paths, cluster_labels):
+        dest_dir = os.path.join(base_dir, cluster_names[label])
+        os.makedirs(dest_dir, exist_ok=True)
+        shutil.move(file_path, dest_dir)
 
-# Perform K-means clustering for test data
-np.random.seed(42)  # Set a random seed for reproducibility
-kmeans_test = KMeans(n_clusters=2)
-kmeans_test.fit(X_test)
-test_cluster_labels = kmeans_test.labels_
+# Load images and labels
+train_images = load_image_paths(train_img_dir)
+test_images = load_image_paths(test_img_dir)
+train_labels = load_image_paths(train_label_dir)
+test_labels = load_image_paths(test_label_dir)
 
-# Visualization
-# Display 5 images from each cluster
-for cluster_label in range(2):
-    train_cluster_images = [img_path for img_path, label in zip(train_images, train_cluster_labels) if
-                            label == cluster_label]
-    random_train_cluster_images = random.sample(train_cluster_images, min(3, len(train_cluster_images)))
-    cluster_type = "Train BW" if cluster_label == 0 else "Train Color"
+# Compute mean saturation values
+X_train = compute_saturation(train_images)
+X_test = compute_saturation(test_images)
 
-    print(f"Cluster {cluster_label + 1} ({cluster_type}):")
-    for img_path in random_train_cluster_images:
-        img = cv2.imread(img_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        plt.title(cluster_type)
-        plt.imshow(img)
-        plt.axis("off")
-        plt.show()
+# Perform clustering
+train_cluster_labels = perform_clustering(X_train)
+test_cluster_labels = perform_clustering(X_test)
 
-# Display 5 images from each cluster
-for cluster_label in range(2):
-    test_cluster_images = [img_path for img_path, label in zip(test_images, test_cluster_labels) if
-                           label == cluster_label]
-    random_test_cluster_images = random.sample(test_cluster_images, min(3, len(test_cluster_images)))
-    cluster_type = "Test Color" if cluster_label == 0 else "Test BW"
+# Define cluster names
+cluster_mapping = {0: "bw", 1: "color"}
 
-    print(f"Cluster {cluster_label + 1} ({cluster_type}):")
-    for img_path in random_test_cluster_images:
-        img = cv2.imread(img_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        plt.title(cluster_type)
-        plt.imshow(img)
-        plt.axis("off")
-        plt.show()
+# Visualize results
+visualize_clusters(train_images, train_cluster_labels, cluster_mapping)
+visualize_clusters(test_images, test_cluster_labels, cluster_mapping)
 
-# Move train images to appropriate directories based on clustering results
-for img_path, cluster_label in zip(train_images, train_cluster_labels):
-    cluster_type = "BlackWhite" if cluster_label == 0 else "Colored"
-    new_dir = os.path.join(train_image_dir, cluster_type)
-    os.makedirs(new_dir, exist_ok=True)
-    shutil.move(img_path, new_dir)
-
-# Move test images to appropriate directories based on clustering results
-for img_path, cluster_label in zip(test_images, test_cluster_labels):
-    cluster_type = "Colored" if cluster_label == 0 else "BlackWhite"
-    new_dir = os.path.join(test_image_dir, cluster_type)
-    os.makedirs(new_dir, exist_ok=True)
-    shutil.move(img_path, new_dir)
-
-# Move train labels to appropriate directories based on clustering results
-for label_path, cluster_label in zip(train_labels, train_cluster_labels):
-    cluster_type = "BlackWhite" if cluster_label == 0 else "Colored"
-    new_dir = os.path.join(train_label_dir, cluster_type)
-    os.makedirs(new_dir, exist_ok=True)
-    shutil.move(label_path, new_dir)
-
-# Move test labels to appropriate directories based on clustering results
-for label_path, cluster_label in zip(test_labels, test_cluster_labels):
-    cluster_type = "Colored" if cluster_label == 0 else "BlackWhite"
-    new_dir = os.path.join(test_label_dir, cluster_type)
-    os.makedirs(new_dir, exist_ok=True)
-    shutil.move(label_path, new_dir)
+# Move files into corresponding clusters
+move_files(train_images, train_cluster_labels, train_img_dir, cluster_mapping)
+move_files(test_images, test_cluster_labels, test_img_dir, cluster_mapping)
+move_files(train_labels, train_cluster_labels, train_label_dir, cluster_mapping)
+move_files(test_labels, test_cluster_labels, test_label_dir, cluster_mapping)
