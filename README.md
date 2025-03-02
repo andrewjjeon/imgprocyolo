@@ -1,5 +1,13 @@
 # Colored and BlackWhite Image Clustering and Transformation for YOLO model detection
 
+### Before
+![Before](media/before1.jpg)
+
+### After
+![After](media/after1.jpg)
+
+Before and After imgprocyolo Object Detection Results
+
 ### Goal and Approach
 
 This repo automates the preprocessing of fisheye camera images by clustering them into blackwhite or colored images, however it should also work for other types of images. It uses KMeans clustering based on HSV saturation levels, splits images into their different cluster directories, and converts colored images to grayscale using OpenCV. You can then retrain YOLO models on an all blackwhite image set, which enhances object detection performance in night-time scenes.
