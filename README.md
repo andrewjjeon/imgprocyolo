@@ -1,9 +1,9 @@
 # Colored and BlackWhite Image Clustering and Transformation for YOLO model detection
 
-### Before
+### Before imgprocyolo
 <img src="media/before1.jpg" alt="Before imgprocyolo" width="50%">
 
-### After
+### After imgprocyolo
 <img src="media/after1.jpg" alt="After imgprocyolo" width="50%">
 
 Before and After imgprocyolo Object Detection Results
