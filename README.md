@@ -32,11 +32,11 @@
 
 <div style="display: flex; justify-content: center; gap: 20px;">
     <div style="text-align: center;">
-        <img src="/images/yolo/before2.png" width="400"/>
+        <img src="/media/before2.png" width="400"/>
         <p><em>Detector Trained on Original Data Inference</em></p>
     </div>
     <div style="text-align: center;">
-        <img src="/images/yolo/after2.png" width="400"/>
+        <img src="/media/after2.png" width="400"/>
         <p><em>Detector Trained on Transformed Data Inference</em></p>
     </div>
 </div>
