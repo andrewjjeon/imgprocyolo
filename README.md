@@ -19,6 +19,9 @@
     <p><em>Above: Performance of detector trained on original data. Below: Performance of detector trained on my transformed data.</em></p>
 </div>
 
+<img src="/media/before1.jpg" width="300"/> <img src="/media/after1.jpg" width="300"/>
+
+
 <div style="display: flex; justify-content: center; gap: 20px;">
     <div style="text-align: center;">
         <img src="/media/before1.jpg" width="300"/>
