@@ -19,29 +19,16 @@
     <p><em>Above: Performance of detector trained on original data. Below: Performance of detector trained on my transformed data.</em></p>
 </div>
 
-<img src="/media/before1.jpg" width="300"/> <img src="/media/after1.jpg" width="300"/>
-
-
-<div style="display: flex; justify-content: center; gap: 20px;">
-    <div style="text-align: center;">
-        <img src="/media/before1.jpg" width="300"/>
-        <p><em>Detector Trained on Original Data Inference</em></p>
-    </div>
-    <div style="text-align: center;">
-        <img src="/media/after1.jpg" width="300"/>
-        <p><em>Detector Trained on Transformed Data Inference</em></p>
-    </div>
+<div style="text-align:center">
+  <img src="/media/before1.jpg" width="300" style="vertical-align: top; margin-right:20px;" />
+  <img src="/media/after1.jpg" width="250" style="vertical-align: top; margin-right:20px;" />
+  <p><em>Detector Trained on Original Data vs Detector Trained on Transformed Data</em></p>
 </div>
 
-<div style="display: flex; justify-content: center; gap: 20px;">
-    <div style="text-align: center;">
-        <img src="/media/before2.png" width="300"/>
-        <p><em>Detector Trained on Original Data Inference</em></p>
-    </div>
-    <div style="text-align: center;">
-        <img src="/media/after2.png" width="300"/>
-        <p><em>Detector Trained on Transformed Data Inference</em></p>
-    </div>
+<div style="text-align:center">
+  <img src="/media/before2.png" width="300" style="vertical-align: top; margin-right:20px;" />
+  <img src="/media/after2.png" width="250" style="vertical-align: top; margin-right:20px;" />
+  <p><em>Detector Trained on Original Data vs Detector Trained on Transformed Data</em></p>
 </div>
 
 ### Environment Setup
