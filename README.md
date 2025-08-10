@@ -15,7 +15,7 @@
     I then use the Ultralytics package to load and train a yolov8m detector on the original dataset and my transformed dataset. I then trained and compared the validation set performance of the detector trained on the original data and the detector trained on my transformed data. There was a 10% improvement in mAP50-95 for all classes and a 6% improvement in mAP50 in model performance.
 
 <div align="center">
-    <img src="/images/yolo/yolo_results.png" width="800" />
+    <img src="/media/yolo_results.png" width="800" />
     <p><em>Above: Performance of detector trained on original data. Below: Performance of detector trained on my transformed data.</em></p>
 </div>
 
@@ -25,10 +25,10 @@
         <p><em>Detector Trained on Original Data Inference</em></p>
     </div>
 
-    <div style="text-align: center;">
-        <img src="/media/after1.jpg" width="400"/>
-        <p><em>Detector Trained on Transformed Data Inference</em></p>
-    </div>
+<div style="text-align: center;">
+    <img src="/media/after1.jpg" width="400"/>
+    <p><em>Detector Trained on Transformed Data Inference</em></p>
+</div>
 </div>
 
       <div style="display: flex; justify-content: center; gap: 20px;">
